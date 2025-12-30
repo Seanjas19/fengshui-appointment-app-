@@ -12,10 +12,13 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+//To know server is running
 app.get("/", (req, res) => {
     res.send("Feng Shui Server is Running");
 });
 
+
+//Let user to see their booking
 app.get("/api/appointment", authorize, async (req, res) => {
     try{
         const get_appointments = await db.query("SELECT * FROM appointments WHERE user_id = $1", [req.user]);
@@ -31,6 +34,7 @@ app.get("/api/appointment", authorize, async (req, res) => {
     }
 });
 
+//User login with authentication and authorization(JWT)
 app.post("/api/login", async (req, res) => {
     try {
         const {user_email, user_password} = req.body;
@@ -50,6 +54,7 @@ app.post("/api/login", async (req, res) => {
             return res.status(401).json({message: "Invalid Email and Password!"});
         }
 
+        //Give user a Wristband for Bounder to check without this is unauthorized
         const token = jwt.sign(
             {id: checkUser.rows[0].user_id},
             process.env.JWT_SECRET,
@@ -71,7 +76,7 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-
+//Let user to sign up an account and the password they created should be hashed
 app.post("/api/sign-up", async (req, res) => {
     try {
         const {username, user_email, user_password, user_phone} = req.body;
@@ -102,6 +107,8 @@ app.post("/api/sign-up", async (req, res) => {
     }
 });
 
+
+//Let non-member user to create contact
 app.post("/api/contact", async (req, res) => {
     try{
         //Extract Contact data from Request Body
@@ -128,6 +135,8 @@ app.post("/api/contact", async (req, res) => {
 
 });
 
+
+//let authorized user to book their appointment
 app.post("/api/appointment", authorize, async (req, res) => {
 
     try{
@@ -151,6 +160,8 @@ app.post("/api/appointment", authorize, async (req, res) => {
     }
 })
 
+
+//Backend is listen to which PORT 
 app.listen(PORT, () => {
     console.log(`Server is Running on port ${PORT}`);
 });
