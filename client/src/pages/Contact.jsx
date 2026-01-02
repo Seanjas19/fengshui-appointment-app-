@@ -28,7 +28,7 @@ const Contact = () => {
                 <input
                     type="text"
                     placeholder= "Name"
-                    onChange={e => setFormData({...formData, contact_name: e.target.value})}
+                    onChange={(e) => setFormData({...formData, contact_name: e.target.value})}
                 />
                 {/* Add inputs for email, phone, and message similarly */}
                 <button type="Submit">Send</button>
