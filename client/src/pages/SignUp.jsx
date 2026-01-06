@@ -6,7 +6,7 @@ const SignUp = () => {
         username: "",
         user_email: "",
         user_password: "",
-        user_phone: ""
+        user_contact: ""
     });
 
 
@@ -43,7 +43,7 @@ const SignUp = () => {
                 <input
                     type="tel"
                     placeholder= "Phone Number"
-                    onChange= {(e) => setFormData({...formData, user_phone: e.target.value})}
+                    onChange= {(e) => setFormData({...formData, user_contact: e.target.value})}
                 />
                 <button type="submit">Sign Up</button>
             </form>

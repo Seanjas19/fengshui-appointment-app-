@@ -4,7 +4,7 @@ CREATE TABLE users
     username VARCHAR(255) NOT NULL,
     user_email VARCHAR(255) NOT NULL,
     user_password VARCHAR(255) NOT NULL,
-    user_phone VARCHAR(50) NOT NULL,
+    user_contact VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

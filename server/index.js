@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const authorize = require("./middleware/authorization.js");
 require("dotenv").config();
 
@@ -79,7 +80,7 @@ app.post("/api/login", async (req, res) => {
 //Let user to sign up an account and the password they created should be hashed
 app.post("/api/sign-up", async (req, res) => {
     try {
-        const {username, user_email, user_password, user_phone} = req.body;
+        const {username, user_email, user_password, user_contact} = req.body;
 
         const existUser = await db.query("SELECT * FROM users WHERE user_email = $1", [user_email]);
 
@@ -92,8 +93,8 @@ app.post("/api/sign-up", async (req, res) => {
         const bcrypt_password = await bcrypt.hash(user_password, salt);
 
         const newUser = await db.query(
-            "INSERT INTO users( username, user_email, user_password, user_phone) VALUES ($1, $2, $3, $4) RETURNING *",
-            [username, user_email, bcrypt_password, user_phone]
+            "INSERT INTO users( username, user_email, user_password, user_contact) VALUES ($1, $2, $3, $4) RETURNING *",
+            [username, user_email, bcrypt_password, user_contact]
         );
 
         res.status(201).json({
