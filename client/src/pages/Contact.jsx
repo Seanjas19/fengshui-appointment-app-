@@ -10,10 +10,10 @@ const Contact = () => {
         contact_message: ""
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = api.post("/contact", formData);
+            const response = await api.post("/contact", formData);
             alert(response.data.message);
         }
         catch (err) {
@@ -30,8 +30,25 @@ const Contact = () => {
                     placeholder= "Name"
                     onChange={(e) => setFormData({...formData, contact_name: e.target.value})}
                 />
+
+                <input
+                    type="email"
+                    placeholder= "Email"
+                    onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
+                />
+
+                <input
+                    type="tel"
+                    placeholder= "Phone"
+                    onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
+                />
+
+                <textarea
+                    placeholder= "Message"
+                    onChange={(e) => setFormData({...formData, contact_message: e.target.value})}
+                />
                 {/* Add inputs for email, phone, and message similarly */}
-                <button type="Submit">Send</button>
+                <button type="submit">Send</button>
             </form>
         </div>
     );

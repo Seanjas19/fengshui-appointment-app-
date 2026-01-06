@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db");
 const jwt = require("jsonwebtoken");
-const authorize = require("./middeware/authorization.js");
+const authorize = require("./middleware/authorization.js");
 require("dotenv").config();
 
 const app = express();

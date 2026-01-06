@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 //Authorization function act as a Bounder
-module.export = async (req, res, next) => {
+module.exports = async (req, res, next) => {
     
     try{
 
