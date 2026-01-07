@@ -6,18 +6,40 @@ const SignUp = () => {
         username: "",
         user_email: "",
         user_password: "",
+        confirm_password: "",
         user_contact: ""
     });
-
+    
+    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        if (formData.user_password !== formData.confirm_password) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        const clean_data = {
+            username: formData.username.trim(),
+            user_email: formData.user_email.trim(),
+            user_password: formData.user_password,
+            confirm_password: formData.confirm_password,
+            user_contact: formData.user_contact.trim()
+        }
+
+        if (!clean_data.username || !clean_data.user_email || !formData.user_password || !clean_data.user_contact) {
+            setError("All fields are required");
+            return;
+        }
+
         try {
-            const response = await api.post("/sign-up", formData);
+            const response = await api.post("/sign-up", clean_data);
             alert(response.data.message);
         }
         catch (err) {
-            alert("Error signing up. Please try again later.");
+            setError("Error signing up. Please try again later.");
         }
     };
 
@@ -25,6 +47,7 @@ const SignUp = () => {
         <div>
             <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
+                {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
                 <input
                     type="text"
                     placeholder= "Username"
@@ -41,6 +64,11 @@ const SignUp = () => {
                     onChange= {(e) => setFormData({...formData, user_password: e.target.value})}
                 />
                 <input
+                    type="password"
+                    placeholder= "Confirm Password"
+                    onChange= {(e) => setFormData({...formData, confirm_password: e.target.value})}
+                />
+                <input
                     type="tel"
                     placeholder= "Phone Number"
                     onChange= {(e) => setFormData({...formData, user_contact: e.target.value})}
@@ -48,7 +76,7 @@ const SignUp = () => {
                 <button type="submit">Sign Up</button>
             </form>
         </div>
-    )
+    );
 }
 
 
