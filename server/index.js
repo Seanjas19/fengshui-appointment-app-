@@ -150,6 +150,15 @@ app.post("/api/appointment", authorize, async (req, res) => {
 
         const {appointment_date, appointment_status, service_type, user_message} = req.body;
 
+        const selectedDate = new Date(appointment_date);
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        selectedDate.setUTCHours(0, 0, 0, 0);
+
+        if (selectedDate <= today) {
+            return res.status(400).json({message: "You cannot book an appointment in the past!"});
+        }
+
         const newAppointment = await db.query(
             "INSERT INTO appointments(user_id, appointment_date, appointment_status, service_type, user_message) VALUES ($1, $2, $3, $4, $5) RETURNING *",
             [req.user, appointment_date, appointment_status, service_type, user_message]
@@ -189,7 +198,40 @@ app.delete("/api/appointment/:id", authorize, async(req, res) => {
     }
 });
 
+app.put("/api/appointment/:id", authorize, async(req, res) => {
+    try {
+
+        const { id } = req.params;
+        const { appointment_date, service_type, user_message } = req.body;
+
+        const selectedDate = new Date(appointment_date);
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        selectedDate.setUTCHours(0, 0, 0, 0);
+
+        if (selectedDate <= today) {
+            return res.status(400).json({ message: "You cannot book an appointment in the past or for today!" });
+        }
+
+        const updateData = await db.query(
+            "UPDATE appointments SET appointment_date = $1, service_type = $2, user_message = $3 WHERE appointment_id = $4 AND user_id = $5 RETURNING *",
+            [appointment_date, service_type, user_message, id, req.user]
+        );
+
+        if (updateData.rows.length === 0) {
+            return res.status(404).json({ message: "Appointment not found or unauthorized" });
+        }
+
+        res.json({ message: "Appointment Updated Successfully!" });
+    } 
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+})
+
 //Backend is listen to which PORT 
 app.listen(PORT, () => {
     console.log(`Server is Running on port ${PORT}`);
 });
+

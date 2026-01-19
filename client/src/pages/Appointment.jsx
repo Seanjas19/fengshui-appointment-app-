@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from "../api/axios";
 
 const Appointment = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -26,9 +30,9 @@ const Appointment = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Cancel this appointment?")) return;
         try {
-            // Check spelling: /appointment/ or /appoinment/?
             await api.delete(`/appointment/${id}`);
-            setAppointments(appointments.filter(appt => appt.id !== id));
+            setAppointments((prevAppointments) =>
+                prevAppointments.filter(appt => appt.appointment_id !== id));
         } catch (err) {
             console.error("Delete failed:", err);
         }
@@ -39,6 +43,12 @@ const Appointment = () => {
     return (
         <div>
             <h1>My Feng Shui Appointments</h1>
+            <button 
+                onClick={() => navigate('/book')}
+                style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+            >
+                + Book New Consultation
+            </button>
             {appointments.length === 0 ? (
                 <p>No appointments found. Book one today!</p>
             ) : (
@@ -58,6 +68,12 @@ const Appointment = () => {
                                 <td>{appt.service_type}</td>
                                 <td>{appt.appointment_status}</td>
                                 <td>
+                                    <button
+                                        onClick={() => navigate('/book', { state: { editData: appt } })}
+                                        style={{ marginRight: '10px', cursor: 'pointer', color: 'blue' }}
+                                    >
+                                        Edit
+                                    </button>
                                     <button 
                                         onClick={() => handleDelete(appt.appointment_id)} 
                                         style={{ color: 'red', cursor: 'pointer'}}

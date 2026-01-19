@@ -27,7 +27,7 @@ instance.interceptors.response.use(
     (response) => {
     return response;
 }, (error) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 401 || error.response.status === 403) {
         localStorage.removeItem('token');
 
         alert("Session expired. Please log in again.");
