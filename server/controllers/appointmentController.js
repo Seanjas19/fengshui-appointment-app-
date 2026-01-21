@@ -3,22 +3,22 @@ const db = require("../db");
 
 
 
-const getAppointment = async (req, res) => {
+const getAppointment = async (req, res, next) => {
     try {
         const get_appointment = await db.query("SELECT * FROM appointments WHERE user_id = $1", [req.user]);
 
         res.status(200).json({
+            success: true,
             message: "Appointment Retrieved Successfully!",
             appointments: get_appointment.rows
         });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err)
     }
 }
 
-const createAppointment = async (req, res) => {
+const createAppointment = async (req, res, next) => {
     try {
         const {appointment_date, appointment_status, service_type, user_message} = req.body;
         
@@ -28,7 +28,9 @@ const createAppointment = async (req, res) => {
         selectedDate.setUTCHours(0, 0, 0, 0);
         
         if (selectedDate <= today) {
-            return res.status(400).json({message: "You cannot book an appointment in the past!"});
+            const error = new Error("You cannot book an appointment in the past or for today!");
+            error.statusCode = 400;
+            throw error;
         }
         
         const newAppointment = await db.query(
@@ -39,18 +41,18 @@ const createAppointment = async (req, res) => {
         console.log("DEBUG 4 : New Appointment save in SQL:", newAppointment.rows[0]);
         
         res.status(201).json({
+            success: true,
             message: "Appointment Successful",
             appointment: newAppointment.rows[0]
         })
         
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error")
+        next(err);
     }
 }
 
-const updateAppointment = async (req, res) => {
+const updateAppointment = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { appointment_date, service_type, user_message } = req.body;
@@ -61,7 +63,9 @@ const updateAppointment = async (req, res) => {
         selectedDate.setUTCHours(0, 0, 0, 0);
         
         if (selectedDate <= today) {
-            return res.status(400).json({ message: "You cannot book an appointment in the past or for today!" });
+            const error = new Error("You cannot book an appointment in the past or for today!");
+            error.statusCode = 400;
+            throw error;
         }
         
         const updateData = await db.query(
@@ -70,18 +74,19 @@ const updateAppointment = async (req, res) => {
         );
         
         if (updateData.rows.length === 0) {
-            return res.status(404).json({ message: "Appointment not found or unauthorized" });
+            const error = new Error("Appointment not found or unauthorized");
+            error.statusCode = 404;
+            throw error;
         }
         
         res.json({ message: "Appointment Updated Successfully!" });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err);
     }
 }
 
-const deleteAppointment = async (req, res) => {
+const deleteAppointment = async (req, res, next) => {
     try {
         const {id} = req.params;
         
@@ -90,14 +95,18 @@ const deleteAppointment = async (req, res) => {
         const del_appointment = await db.query("DELETE FROM appointments WHERE appointment_id = $1 AND user_id = $2 RETURNING *", [id, user_id]);
         
         if (del_appointment.rows.length === 0) {
-            return res.status(404).json({ message: "Appointment not found or unauthorized" });
+            const error = new Error("Appointment not found or unauthorized");
+            error.statusCode = 404;
+            throw error;
         }
                 
-        res.status(200).json({message: "Appointment Cancelled Successfully!"});
+        res.status(200).json({
+            success: true,
+            message: "Appointment Cancelled Successfully!"
+        });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err);
     }
 }
 

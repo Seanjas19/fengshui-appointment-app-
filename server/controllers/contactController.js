@@ -1,6 +1,6 @@
 const db = require("../db");
 
-const createContact = async(req, res) => {
+const createContact = async(req, res, next) => {
     try {
         //Extract Contact data from Request Body
         const {contact_name, contact_email, contact_phone, contact_message} = req.body;
@@ -13,13 +13,13 @@ const createContact = async(req, res) => {
                 
         //pass successful message to browser 
         res.status(201).json({
+            success: true,
             message: "Message sent successfully!",
             data: newContact.rows[0]
         });
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err);
     }
 }
 

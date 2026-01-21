@@ -4,14 +4,16 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
         const {username, user_email, user_password, user_contact} = req.body;
 
         const existUser = await db.query("SELECT * FROM users WHERE user_email = $1", [user_email]);
 
         if (existUser.rows.length !== 0) {
-            return res.status(401).send("User already existed!");
+            const error = new Error("User already exists!");
+            error.statusCode = 400;
+            throw error;
         }
 
         const numSalt = 10;
@@ -26,24 +28,26 @@ const register = async (req, res) => {
         );
 
         res.status(201).json({
+            success: true,
             message: "Sign Up Successful!",
             user_id: newUser.rows[0].user_id
         });
     } 
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err);    
     }
 }
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const {user_email, user_password} = req.body;
 
         const checkUser = await db.query("SELECT * FROM users WHERE user_email = $1", [user_email]);
 
         if (checkUser.rows.length === 0) {
-            return res.status(401).send("Account does not exist!");
+            const error = new Error("Account does not exist!");
+            error.statusCode = 401;
+            throw error;
         }
 
         const valid_password = await bcrypt.compare(
@@ -52,7 +56,9 @@ const login = async (req, res) => {
         )
 
         if (!valid_password){
-            return res.status(401).json({message: "Invalid Email or Password"});
+            const error = new Error("Invalid Email or Password");
+            error.statusCode = 401;
+            throw error;
         }
 
         const token = jwt.sign(
@@ -62,6 +68,7 @@ const login = async (req, res) => {
         )
 
         res.status(200).json({
+            success: true,
             message: "Login Successful!",
             token: token,
             user: {
@@ -72,8 +79,7 @@ const login = async (req, res) => {
 
     }
     catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+        next(err);
     }
 }
 

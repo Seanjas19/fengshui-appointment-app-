@@ -15,6 +15,10 @@ app.use("/api/appointment", require("./routes/appointmentRoutes.js"));
 
 app.use("/api/contact", require("./routes/contactRoutes"));
 
+const errorMiddleware = require("./middleware/errorMiddleware.js");
+app.use(errorMiddleware);
+
+
 const PORT = process.env.PORT || 5000;
 
 //To know server is running
