@@ -2,7 +2,7 @@ CREATE TABLE users
 (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) UNIQUE NOT NULL,
     user_password VARCHAR(255) NOT NULL,
     user_contact VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -24,6 +24,9 @@ CREATE TABLE appointments
     appointment_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id),
     appointment_date DATE NOT NULL,
+    service_type VARCHAR(255) NOT NULL,  
+    user_message TEXT,
     appointment_status VARCHAR(50) DEFAULT 'confirmed',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

@@ -10,7 +10,8 @@ const registerValidator = [
     body("username")
         .trim()
         .notEmpty().withMessage("Username cannot be empty")
-        .isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
+        .isLength({ min: 3 }).withMessage("Username must be at least 3 characters long")
+        .escape(), // Security: Prevents XSS in the username
 
     body("user_password")
         .isStrongPassword({
@@ -37,9 +38,35 @@ const loginValidator = [
 
     body("user_password")
         .notEmpty().withMessage("Password is required")
-]
+];
+
+// Rules for Contact Form
+const contactValidator = [
+    body("contact_name")
+        .trim()
+        .notEmpty().withMessage("Name is required")
+        .escape(), // Security: Prevents XSS
+
+    body("contact_email")
+        .trim()
+        .isEmail().withMessage("Valid email is required")
+        .normalizeEmail(),
+
+    body("contact_phone")
+        .trim()
+        .notEmpty().withMessage("Phone number is required")
+        .isNumeric().withMessage("Phone must be numeric")
+        .isLength({ min: 10, max: 15 }).withMessage("Invalid phone number length"),
+
+    body("contact_message")
+        .trim()
+        .notEmpty().withMessage("Message cannot be empty")
+        .isLength({ max: 500 }).withMessage("Message is too long (max 500 chars)")
+        .escape() // Security: Prevents XSS
+];
 
 module.exports = {
     registerValidator,
-    loginValidator
-}
+    loginValidator,
+    contactValidator
+};

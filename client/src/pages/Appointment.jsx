@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from "../api/axios";
+import appointmentService from '../services/appointmentService';
 
 const Appointment = () => {
     const [appointments, setAppointments] = useState([]);
@@ -12,12 +12,8 @@ const Appointment = () => {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                // Use 'api' so the interceptor sends your token!
-                const response = await api.get('/appointment');
-                console.log("Type of response.data:", typeof response.data); // Should be 'object'
-                console.log("Is it an Array?:", Array.isArray(response.data)); // Must be 'true'
-                console.log("Actual Data:", response.data);
-                setAppointments(response.data.appointments);
+                const data = await appointmentService.getAppointment();
+                setAppointments(data.appointments);
             } catch (err) {
                 console.error("Error fetching appointments:", err);
             } finally {
@@ -30,7 +26,7 @@ const Appointment = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Cancel this appointment?")) return;
         try {
-            await api.delete(`/appointment/${id}`);
+            await appointmentService.deleteAppointment(id);
             setAppointments((prevAppointments) =>
                 prevAppointments.filter(appt => appt.appointment_id !== id));
         } catch (err) {

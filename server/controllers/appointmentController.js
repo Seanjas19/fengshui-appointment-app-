@@ -69,7 +69,7 @@ const updateAppointment = async (req, res, next) => {
         }
         
         const updateData = await db.query(
-            "UPDATE appointments SET appointment_date = $1, service_type = $2, user_message = $3 WHERE appointment_id = $4 AND user_id = $5 RETURNING *",
+            "UPDATE appointments SET appointment_date = $1, service_type = $2, user_message = $3, updated_at = CURRENT_TIMESTAMP WHERE appointment_id = $4 AND user_id = $5 RETURNING *",
             [appointment_date, service_type, user_message, id, req.user]
         );
         

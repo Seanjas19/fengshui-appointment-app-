@@ -1,34 +1,26 @@
-import React, {useState} from "react";
-import api from "../api/axios";
+import React, { useState } from "react";
+import authService from "../services/authService";
 
 const Login = () => {
-
     const [formData, setFormData] = useState({
         user_email: "",
         user_password: ""
     });
 
     const [error, setError] = useState("");
-
     const [success, setSuccess] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(""); // Reset error
 
         try {
-            const response = await api.post("/auth/login", {
-                user_email: formData.user_email.trim(),
-                user_password: formData.user_password
-            });
-            const token = response.data.token;
-            localStorage.setItem('token', token);
-
+            await authService.login(formData.user_email, formData.user_password);
             setSuccess(true);
 
             setTimeout(() => {
-            window.location.href = "/";
+                window.location.href = "/";
             }, 2000);
-
         }
         catch (err) {
             setError(err.response?.data?.message || "Invalid username or password");

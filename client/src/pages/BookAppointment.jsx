@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import appointmentService from "../services/appointmentService";
 
 
 const BookAppointment = () => {
@@ -34,10 +34,10 @@ const BookAppointment = () => {
         try {
 
             if (editData) {
-                await api.put(`/appointment/${editData.appointment_id}`, formData);
+                await appointmentService.updateAppointment(editData.appointment_id, formData);
             }
             else {
-                const response = await api.post("/appointment", formData);
+                await appointmentService.createAppointment(formData);
                 setStatus("Success! Your appointment is booked.");
             }
 

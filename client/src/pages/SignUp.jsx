@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import api from "../api/axios";
+import React, { useState } from "react";
+import authService from "../services/authService";
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -14,32 +14,29 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setError("");
 
         if (formData.user_password !== formData.confirm_password) {
             setError("Passwords do not match");
             return;
         }
 
-        const clean_data = {
-            username: formData.username.trim(),
-            user_email: formData.user_email.trim(),
-            user_password: formData.user_password,
-            confirm_password: formData.confirm_password,
-            user_contact: formData.user_contact.trim()
-        }
-
-        if (!clean_data.username || !clean_data.user_email || !formData.user_password || !clean_data.user_contact) {
+        if (!formData.username || !formData.user_email || !formData.user_password || !formData.user_contact) {
             setError("All fields are required");
             return;
         }
 
         try {
-            const response = await api.post("/auth/sign-up", clean_data);
-            alert(response.data.message);
+            const response = await authService.register({
+                username: formData.username.trim(),
+                user_email: formData.user_email.trim(),
+                user_password: formData.user_password,
+                user_contact: formData.user_contact.trim()
+            });
+            alert(response.message);
         }
         catch (err) {
-            setError("Error signing up. Please try again later.");
+            setError(err.response?.data?.message || "Error signing up. Please try again later.");
         }
     };
 
